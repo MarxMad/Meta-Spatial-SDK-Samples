@@ -1,0 +1,8 @@
+<resources>
+  <!-- Transparent background theme for spatial panels -->
+  <style name="PanelAppThemeTransparent" parent="android:Theme.Material.NoActionBar">
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:colorBackgroundCacheHint">@null</item>
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+</resources>

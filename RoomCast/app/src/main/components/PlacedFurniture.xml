@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ComponentSchema
+  packageName="com.meta.roomcast"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://developers.meta.com/horizon/spatial-sdk/0.13.0/ComponentSchema.xsd"
+>
+  <!--
+    PlacedFurniture — Componente ECS custom para RoomCast.
+    Almacena metadatos de un mueble colocado en la habitación real.
+  -->
+  <Component name="PlacedFurniture">
+    <!-- ID del mueble del catálogo -->
+    <StringAttribute name="furnitureId" defaultValue="" />
+    <!-- Marca / tienda (para White Label) -->
+    <StringAttribute name="brandId"     defaultValue="" />
+    <!-- Precio en MXN -->
+    <FloatAttribute  name="price"       defaultValue="0.0f" />
+    <!-- Dimensiones reales en metros -->
+    <FloatAttribute  name="widthM"      defaultValue="0.0f" />
+    <FloatAttribute  name="depthM"      defaultValue="0.0f" />
+    <FloatAttribute  name="heightM"     defaultValue="0.0f" />
+    <!-- URL de compra directa -->
+    <StringAttribute name="purchaseUrl" defaultValue="" />
+  </Component>
+</ComponentSchema>

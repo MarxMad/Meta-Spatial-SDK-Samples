@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <item type="id" name="dock_panel" />
+  <item type="id" name="editor_panel" />
+  <item type="id" name="terminal_panel" />
+  <item type="id" name="web_panel" />
+</resources>

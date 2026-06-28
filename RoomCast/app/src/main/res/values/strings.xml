@@ -1,0 +1,20 @@
+<resources>
+  <string name="app_name">RoomCast</string>
+  <string name="scan_title">Escanear tu habitación</string>
+  <string name="scan_subtitle">RoomCast usará los sensores de tu Quest 3 para mapear tu espacio y mostrarte muebles a escala real.</string>
+  <string name="scan_button">Iniciar escaneo</string>
+  <string name="scanning">Escaneando tu habitación…</string>
+  <string name="scan_done">¡Habitación lista!</string>
+  <string name="catalog_title">Catálogo</string>
+  <string name="furniture">Muebles</string>
+  <string name="add_to_room">Ver en mi cuarto</string>
+  <string name="buy_now">Comprar ahora</string>
+  <string name="fits">✓ ¡Cabe perfectamente!</string>
+  <string name="does_not_fit">⚠ No cabe en ese espacio</string>
+  <string name="width">Ancho</string>
+  <string name="depth">Prof.</string>
+  <string name="height">Alto</string>
+  <string name="permission_required">Permiso requerido</string>
+  <string name="permission_desc">RoomCast necesita acceso a los datos de escena del Quest 3 para escanear tu habitación.</string>
+  <string name="grant_permission">Conceder permiso</string>
+</resources>
