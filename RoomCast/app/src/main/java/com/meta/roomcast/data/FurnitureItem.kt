@@ -11,6 +11,7 @@ enum class FurnitureCategory(val displayName: String, val emoji: String) {
   STORAGE("Almacenamiento", "🗄️"),
   LIGHTING("Iluminación", "💡"),
   DECOR("Decoración", "🌿"),
+  MARKETPLACE("Marketplace", "📸"),
 }
 
 /**

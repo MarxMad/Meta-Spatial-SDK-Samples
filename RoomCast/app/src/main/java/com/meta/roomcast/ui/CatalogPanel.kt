@@ -67,6 +67,7 @@ fun CatalogPanel(
     var activeTab by remember { mutableStateOf("Browse") }
     var selectedCategory by remember { mutableStateOf(FurnitureCategory.ALL) }
     var searchQuery by remember { mutableStateOf("") }
+    var categoryQuery by remember { mutableStateOf("") }
 
     val displayItems by remember(selectedCategory, searchQuery) {
       derivedStateOf {
@@ -198,17 +199,26 @@ fun CatalogPanel(
                       .height(44.dp)
               )
 
-              IconButton(onClick = {}) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = textPrimary)
+              IconButton(onClick = { activeTab = "Notifications" }) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = null,
+                    tint = if (activeTab == "Notifications") accentBlue else textPrimary
+                )
               }
               // Profile pic placeholder
               Box(
                   modifier = Modifier
                       .size(36.dp)
-                      .background(Color(0xFFCBD5E1), CircleShape),
+                      .background(if (activeTab == "Profile") accentBlue else Color(0xFFCBD5E1), CircleShape)
+                      .clickable { activeTab = "Profile" },
                   contentAlignment = Alignment.Center
               ) {
-                Text("👤", fontSize = 18.sp)
+                Text(
+                    text = "👤",
+                    fontSize = 18.sp,
+                    color = if (activeTab == "Profile") Color.White else textPrimary
+                )
               }
             }
           }
@@ -216,6 +226,10 @@ fun CatalogPanel(
           // ── Body Grid & Showcase ────────────────────────────────────────────
           if (activeTab == "ScanObject") {
             ObjectScannerSimulator(onPlaceInRoom, onItemSelected)
+          } else if (activeTab == "Profile") {
+            ProfileView()
+          } else if (activeTab == "Notifications") {
+            NotificationsView()
           } else {
             Row(
                 modifier = Modifier
@@ -244,7 +258,7 @@ fun CatalogPanel(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                      Text("🛋️", fontSize = 64.sp)
+                      Text("SELECT 3D", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFCBD5E1), letterSpacing = 2.sp)
                       Spacer(Modifier.height(12.dp))
                       Text(
                           "Selecciona un mueble",
@@ -266,20 +280,26 @@ fun CatalogPanel(
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                       Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Large Emoji / Visual simulation card
+                        // Typographic gradient thumbnail instead of emoji
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(180.dp)
                                 .background(
                                     Brush.radialGradient(
-                                        colors = listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0))
+                                        colors = listOf(Color(0xFFE2E8F0), Color(0xFF94A3B8))
                                     ),
                                     RoundedCornerShape(12.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                          Text(item.category.emoji, fontSize = 90.sp)
+                          Text(
+                              text = item.category.displayName.uppercase(),
+                              fontSize = 20.sp,
+                              fontWeight = FontWeight.Bold,
+                              color = Color(0xFF475569),
+                              letterSpacing = 2.sp
+                          )
                         }
 
                         // Title & Brand
@@ -404,24 +424,52 @@ fun CatalogPanel(
                   modifier = Modifier.weight(0.55f),
                   verticalArrangement = Arrangement.spacedBy(16.dp)
               ) {
-                // Scrollable category chips
+                // Category filter bar
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                  listOf(
+                  TextField(
+                      value = categoryQuery,
+                      onValueChange = { categoryQuery = it },
+                      placeholder = { Text("Filtrar categorías...", fontSize = 11.sp) },
+                      colors = TextFieldDefaults.colors(
+                          focusedContainerColor = Color(0xFFF1F5F9),
+                          unfocusedContainerColor = Color(0xFFF1F5F9),
+                          focusedIndicatorColor = Color.Transparent,
+                          unfocusedIndicatorColor = Color.Transparent
+                      ),
+                      shape = RoundedCornerShape(8.dp),
+                      modifier = Modifier.width(160.dp).height(38.dp)
+                  )
+                  
+                  // Filtered Category Chips (scrollable row)
+                  val categoriesToDisplay = listOf(
                       FurnitureCategory.ALL,
+                      FurnitureCategory.MARKETPLACE,
                       FurnitureCategory.SEATING,
                       FurnitureCategory.TABLES,
                       FurnitureCategory.BEDS,
                       FurnitureCategory.STORAGE,
-                      FurnitureCategory.DECOR
-                  ).forEach { category ->
-                    CategoryTabChip(
-                        category = category,
-                        isSelected = category == selectedCategory,
-                        onClick = { selectedCategory = category }
-                    )
+                      FurnitureCategory.DECOR,
+                      FurnitureCategory.LIGHTING
+                  ).filter { 
+                      it.displayName.contains(categoryQuery, ignoreCase = true) 
+                  }
+
+                  Row(
+                      modifier = Modifier.weight(1f),
+                      horizontalArrangement = Arrangement.spacedBy(6.dp),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                    categoriesToDisplay.forEach { category ->
+                      CategoryTabChip(
+                          category = category,
+                          isSelected = category == selectedCategory,
+                          onClick = { selectedCategory = category }
+                      )
+                    }
                   }
                 }
 
@@ -500,7 +548,19 @@ fun ObjectScannerSimulator(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.weight(1f).widthIn(max = 500.dp)
         ) {
-          Text("📸", fontSize = 72.sp)
+          Box(
+              modifier = Modifier
+                  .size(80.dp)
+                  .background(accentBlue.copy(alpha = 0.1f), CircleShape),
+              contentAlignment = Alignment.Center
+          ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = accentBlue,
+                modifier = Modifier.size(48.dp)
+            )
+          }
           Text(
               "¿Cómo funciona?",
               fontSize = 18.sp,
@@ -508,7 +568,7 @@ fun ObjectScannerSimulator(
               color = textPrimary
           )
           Text(
-              "1. Coloca un objeto real (ej. una caja, juguete o adorno) frente a ti en una mesa bien iluminada.\n" +
+              "1. Coloca un objeto real (ej. una caja, adorno o artículo) frente a ti en una mesa bien iluminada.\n" +
               "2. Presiona 'Iniciar Escaneo'.\n" +
               "3. Mueve tu cabeza lentamente alrededor del objeto en 360 grados.\n" +
               "4. El visor capturará los ángulos y nuestro pipeline en la nube generará el modelo 3D (.glb) listo para vender y colocar.",
@@ -533,7 +593,7 @@ fun ObjectScannerSimulator(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(1f)
         ) {
-          Text("🔍 Escaneando...", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+          Text("Escaneando...", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
           Spacer(Modifier.height(16.dp))
           Box(
               modifier = Modifier
@@ -542,7 +602,7 @@ fun ObjectScannerSimulator(
                   .border(2.dp, accentBlue, CircleShape),
               contentAlignment = Alignment.Center
           ) {
-            Text("📦", fontSize = 64.sp)
+            Text("3D OBJECT", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = accentBlue)
           }
           Spacer(Modifier.height(24.dp))
           LinearProgressIndicator(
@@ -583,7 +643,7 @@ fun ObjectScannerSimulator(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.weight(1f).widthIn(max = 450.dp)
         ) {
-          Text("🎉 ¡Escaneo Completado!", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF16A34A))
+          Text("¡Escaneo Completado!", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF16A34A))
           
           Box(
               modifier = Modifier
@@ -591,7 +651,7 @@ fun ObjectScannerSimulator(
                   .background(Color(0xFFDCFCE7), CircleShape),
               contentAlignment = Alignment.Center
           ) {
-            Text("📦", fontSize = 72.sp)
+            Text("OK", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Color(0xFF16A34A))
           }
 
           Text(
@@ -648,7 +708,7 @@ fun ObjectScannerSimulator(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(1f).widthIn(max = 450.dp)
         ) {
-          Text("⚡ ¡Objeto Colocado en Realidad Mixta!", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentBlue)
+          Text("¡Objeto Colocado en Realidad Mixta!", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentBlue)
           Spacer(Modifier.height(16.dp))
           Text(
               "El objeto 'Caja de Cartón Retro' ahora está en tu habitación física. Puedes usar tus manos o controladores para moverlo y rotarlo.",
@@ -717,7 +777,7 @@ private fun CategoryTabChip(
           .padding(horizontal = 14.dp, vertical = 8.dp),
       contentAlignment = Alignment.Center
   ) {
-    Text("${category.emoji} ${category.displayName}", color = text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    Text(category.displayName, color = text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
   }
 }
 
@@ -745,10 +805,21 @@ private fun CatalogGridCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .background(Color(0xFFF8FAFC), RoundedCornerShape(8.dp)),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0))
+                ),
+                RoundedCornerShape(8.dp)
+            ),
         contentAlignment = Alignment.Center
     ) {
-      Text(item.category.emoji, fontSize = 48.sp)
+      Text(
+          text = item.category.displayName.uppercase(),
+          fontSize = 10.sp,
+          fontWeight = FontWeight.Bold,
+          color = Color(0xFF64748B),
+          letterSpacing = 1.sp
+      )
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -800,9 +871,9 @@ private fun DimensionLabel(label: String, value: String) {
 private fun FitStatusIndicator(status: FitStatusUi) {
   if (status == FitStatusUi.UNKNOWN) return
 
-  val (emoji, text, color, bg) = when (status) {
+  val (indicatorSymbol, text, color, bg) = when (status) {
     FitStatusUi.FITS -> Quadruple("✓", "Cabe perfectamente en tu espacio", Color(0xFF16A34A), Color(0xFFDCFCE7))
-    FitStatusUi.DOES_NOT_FIT -> Quadruple("⚠️", "No cabe en el espacio disponible", Color(0xFFDC2626), Color(0xFFFEE2E2))
+    FitStatusUi.DOES_NOT_FIT -> Quadruple("✕", "No cabe en el espacio disponible", Color(0xFFDC2626), Color(0xFFFEE2E2))
     else -> Quadruple("", "", Color.Transparent, Color.Transparent)
   }
 
@@ -815,7 +886,7 @@ private fun FitStatusIndicator(status: FitStatusUi) {
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       verticalAlignment = Alignment.CenterVertically
   ) {
-    Text(emoji, color = color, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+    Text(indicatorSymbol, color = color, fontWeight = FontWeight.Bold, fontSize = 14.sp)
     Text(text, color = color, fontSize = 11.sp, fontWeight = FontWeight.Medium)
   }
 }
@@ -823,3 +894,147 @@ private fun FitStatusIndicator(status: FitStatusUi) {
 private data class Quadruple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 
 enum class FitStatusUi { UNKNOWN, FITS, DOES_NOT_FIT }
+
+// ── NEW MARKETPLACE PROFILE VIEW ─────────────────────────────────────────────
+
+@Composable
+fun ProfileView() {
+  val textPrimary = Color(0xFF1E293B)
+  val textSecondary = Color(0xFF64748B)
+  val accentBlue = Color(0xFF0F62FE)
+
+  Column(
+      modifier = Modifier
+          .fillMaxSize()
+          .background(Color.White, RoundedCornerShape(16.dp))
+          .padding(32.dp),
+      verticalArrangement = Arrangement.spacedBy(24.dp)
+  ) {
+    Text("Mi Perfil de Creador", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+      Box(
+          modifier = Modifier
+              .size(80.dp)
+              .background(accentBlue, CircleShape),
+          contentAlignment = Alignment.Center
+      ) {
+        Text("JP", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+      }
+      Column {
+        Text("Juan Pérez", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+        Text("Creador del Marketplace · ID: #98342", fontSize = 13.sp, color = textSecondary)
+        Spacer(Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .background(Color(0xFFE0EFE0), RoundedCornerShape(4.dp))
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+          Text("Cuenta Verificada", fontSize = 10.sp, color = Color(0xFF16A34A), fontWeight = FontWeight.Bold)
+        }
+      }
+    }
+
+    Divider(color = Color(0xFFE2E8F0))
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+      ProfileStatCard("Ventas Totales", "$4,500 MXN", Modifier.weight(1f))
+      ProfileStatCard("Modelos 3D Escaneados", "3 Artículos", Modifier.weight(1f))
+      ProfileStatCard("Reputación", "4.9 ★", Modifier.weight(1f))
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      Text("Configuración de Marketplace", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+      Card(
+          modifier = Modifier.fillMaxWidth(),
+          colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+          border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+      ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text("• Facturación: Conectado a Stripe / MercadoPago", fontSize = 12.sp, color = textSecondary)
+          Text("• Sensor LiDAR: Quest 3 Object Mesh Enabled", fontSize = 12.sp, color = textSecondary)
+          Text("• Formato exportado: .glb compatible con Horizon OS", fontSize = 12.sp, color = textSecondary)
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun ProfileStatCard(title: String, value: String, modifier: Modifier = Modifier) {
+  Card(
+      modifier = modifier,
+      colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F5F9)),
+      border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+  ) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+      Text(title, fontSize = 11.sp, color = Color(0xFF64748B))
+      Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+    }
+  }
+}
+
+// ── NEW MARKETPLACE NOTIFICATIONS VIEW ───────────────────────────────────────
+
+@Composable
+fun NotificationsView() {
+  val textPrimary = Color(0xFF1E293B)
+
+  Column(
+      modifier = Modifier
+          .fillMaxSize()
+          .background(Color.White, RoundedCornerShape(16.dp))
+          .padding(32.dp),
+      verticalArrangement = Arrangement.spacedBy(20.dp)
+  ) {
+    Text("Notificaciones", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxSize()) {
+      NotificationItem("¡Nueva venta!", "Un usuario compró tu modelo 'Caja de Cartón Retro' por $45.00 MXN.", "Hace 15 min")
+      NotificationItem("Escaneo procesado", "Tu modelo 'Puerta Rústica Tallada' se ha procesado con éxito en la nube AI y está listo para ser publicado.", "Hace 1 hora")
+      NotificationItem("Actualización de software", "Meta Horizon OS ha actualizado el kit de sensores LiDAR para mayor resolución de malla.", "Ayer")
+      NotificationItem("Verificación de cuenta", "Tu identidad como creador ha sido verificada y ya puedes recibir transferencias directas.", "Hace 3 días")
+    }
+  }
+}
+
+@Composable
+fun NotificationItem(title: String, body: String, time: String) {
+  Card(
+      modifier = Modifier.fillMaxWidth(),
+      colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+      border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+  ) {
+    Row(
+        modifier = Modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+      Box(
+          modifier = Modifier
+              .size(8.dp)
+              .background(Color(0xFF0F62FE), CircleShape)
+      )
+      Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+          Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+          Text(time, fontSize = 10.sp, color = Color(0xFF94A3B8))
+        }
+        Text(body, fontSize = 12.sp, color = Color(0xFF64748B))
+      }
+    }
+  }
+}
