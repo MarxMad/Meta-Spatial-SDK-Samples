@@ -94,6 +94,7 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
   private var selectedItem by mutableStateOf<FurnitureItem?>(null)
   private var fitStatus by mutableStateOf(FitStatusUi.UNKNOWN)
   private var sceneDataLoaded = false
+  private var hasScannedBefore by mutableStateOf(false)
 
   // ── Feature registration ──────────────────────────────────────────────────────
 
@@ -200,6 +201,13 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
     scanPanelEntity?.setComponent(Visible(true))
   }
 
+  /** Cancel re-scan and return directly to catalog panel */
+  private fun cancelRoomScan() {
+    scanState = ScanState.DONE
+    scanPanelEntity?.setComponent(Visible(false))
+    catalogPanelEntity?.setComponent(Visible(true))
+  }
+
   private fun loadSceneFromDevice() {
     if (sceneDataLoaded) return
     sceneDataLoaded = true
@@ -230,6 +238,7 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
 
   private fun onScanComplete() {
     scanState = ScanState.DONE
+    hasScannedBefore = true
 
     // Generate physics collision meshes for floor and walls so furniture lands on real floor
     procMeshSpawner = AnchorProceduralMesh(
@@ -381,6 +390,7 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
                       onGrantPermission = {
                         requestPermissions(arrayOf(PERMISSION_USE_SCENE), REQUEST_CODE_SCENE)
                       },
+                      onCancelScan = if (hasScannedBefore) { { cancelRoomScan() } } else null
                   )
                 }
               }

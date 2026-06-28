@@ -44,6 +44,7 @@ fun RoomScanPanel(
     scanState: ScanState,
     onStartScan: () -> Unit,
     onGrantPermission: () -> Unit,
+    onCancelScan: (() -> Unit)? = null,
 ) {
   RoomCastTheme {
     Box(
@@ -108,11 +109,23 @@ fun RoomScanPanel(
 
         when (scanState) {
           ScanState.IDLE -> {
-            GlassmorphicButton(
-                text = "Iniciar escaneo",
-                onClick = onStartScan,
-                primary = true,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+              GlassmorphicButton(
+                  text = "Iniciar escaneo",
+                  onClick = onStartScan,
+                  primary = true,
+              )
+              if (onCancelScan != null) {
+                GlassmorphicButton(
+                    text = "Cancelar",
+                    onClick = onCancelScan,
+                    primary = false,
+                )
+              }
+            }
           }
           ScanState.SCANNING -> {
             Column(
