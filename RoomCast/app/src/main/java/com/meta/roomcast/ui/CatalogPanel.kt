@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,11 +17,13 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -57,7 +60,8 @@ fun CatalogPanel(
     onItemSelected: (FurnitureItem) -> Unit,
     onPlaceInRoom: (FurnitureItem) -> Unit,
     onRemoveFromRoom: () -> Unit,
-    onRotate: (Float) -> Unit
+    onRotate: (Float) -> Unit,
+    onReScanRoom: () -> Unit
 ) {
   RoomCastTheme {
     var activeTab by remember { mutableStateOf("Browse") }
@@ -119,16 +123,22 @@ fun CatalogPanel(
               onClick = { activeTab = "Browse" }
           )
           SidebarButton(
+              icon = Icons.Default.Refresh,
+              label = "Escanear C.",
+              isSelected = activeTab == "ScanRoom",
+              onClick = { onReScanRoom() }
+          )
+          SidebarButton(
+              icon = Icons.Default.Add,
+              label = "Crear 3D",
+              isSelected = activeTab == "ScanObject",
+              onClick = { activeTab = "ScanObject" }
+          )
+          SidebarButton(
               icon = Icons.Default.FavoriteBorder,
               label = "Favoritos",
               isSelected = activeTab == "Saved",
               onClick = { activeTab = "Saved" }
-          )
-          SidebarButton(
-              icon = Icons.Default.List,
-              label = "Categorías",
-              isSelected = activeTab == "Categories",
-              onClick = { activeTab = "Categories" }
           )
         }
 
@@ -204,230 +214,456 @@ fun CatalogPanel(
           }
 
           // ── Body Grid & Showcase ────────────────────────────────────────────
-          Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f),
-              horizontalArrangement = Arrangement.spacedBy(24.dp)
-          ) {
-            
-            // Left column: Showcase Detail Card
-            Box(
+          if (activeTab == "ScanObject") {
+            ObjectScannerSimulator(onPlaceInRoom, onItemSelected)
+          } else {
+            Row(
                 modifier = Modifier
-                    .weight(0.45f)
-                    .fillMaxHeight()
-                    .background(cardBg, RoundedCornerShape(16.dp))
-                    .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(16.dp))
-                    .padding(20.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-              AnimatedContent(
-                  targetState = selectedItem,
-                  transitionSpec = { fadeIn() togetherWith fadeOut() },
-                  label = "showcaseAnim"
-              ) { item ->
-                if (item == null) {
-                  Column(
-                      modifier = Modifier.fillMaxSize(),
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.Center
-                  ) {
-                    Text("🛋️", fontSize = 64.sp)
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        "Selecciona un mueble",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textPrimary
-                    )
-                    Text(
-                        "Verás las medidas y podrás colocarlo a escala real",
-                        fontSize = 12.sp,
-                        color = textSecondary,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                  }
-                } else {
-                  Column(
-                      modifier = Modifier.fillMaxSize(),
-                      verticalArrangement = Arrangement.SpaceBetween
-                  ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                      // Large Emoji / Visual simulation card
-                      Box(
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .height(180.dp)
-                              .background(
-                                  Brush.radialGradient(
-                                      colors = listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0))
-                                  ),
-                                  RoundedCornerShape(12.dp)
-                              ),
-                          contentAlignment = Alignment.Center
-                      ) {
-                        Text(item.category.emoji, fontSize = 90.sp)
-                      }
-
-                      // Title & Brand
-                      Row(
-                          modifier = Modifier.fillMaxWidth(),
-                          horizontalArrangement = Arrangement.SpaceBetween,
-                          verticalAlignment = Alignment.CenterVertically
-                      ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                          Text(item.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textPrimary)
-                          Text(item.brand, fontSize = 12.sp, color = textSecondary)
-                        }
-                        Text(
-                            "$${"%,.0f".format(item.price)}",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = accentBlue
-                        )
-                      }
-
-                      // Description
+              
+              // Left column: Showcase Detail Card
+              Box(
+                  modifier = Modifier
+                      .weight(0.45f)
+                      .fillMaxHeight()
+                      .background(cardBg, RoundedCornerShape(16.dp))
+                      .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(16.dp))
+                      .padding(20.dp)
+              ) {
+                AnimatedContent(
+                    targetState = selectedItem,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "showcaseAnim"
+                ) { item ->
+                  if (item == null) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                      Text("🛋️", fontSize = 64.sp)
+                      Spacer(Modifier.height(12.dp))
                       Text(
-                          item.description,
+                          "Selecciona un mueble",
+                          fontSize = 16.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = textPrimary
+                      )
+                      Text(
+                          "Verás las medidas y podrás colocarlo a escala real",
                           fontSize = 12.sp,
                           color = textSecondary,
-                          maxLines = 3,
-                          overflow = TextOverflow.Ellipsis
+                          textAlign = TextAlign.Center,
+                          modifier = Modifier.padding(horizontal = 24.dp)
                       )
-
-                      // Dimensions Row
-                      Row(
-                          modifier = Modifier.fillMaxWidth(),
-                          horizontalArrangement = Arrangement.SpaceBetween
-                      ) {
-                        DimensionLabel("Ancho", "${item.widthM}m")
-                        DimensionLabel("Profundidad", "${item.depthM}m")
-                        DimensionLabel("Alto", "${item.heightM}m")
-                      }
-
-                      // Fit status check
-                      FitStatusIndicator(fitStatus)
-
-                      // Rotation Controls (Only visible if the item is currently placed in the room)
-                      if (isPlaced) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                    }
+                  } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                      Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // Large Emoji / Visual simulation card
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .background(
+                                    Brush.radialGradient(
+                                        colors = listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0))
+                                    ),
+                                    RoundedCornerShape(12.dp)
+                                ),
+                            contentAlignment = Alignment.Center
                         ) {
+                          Text(item.category.emoji, fontSize = 90.sp)
+                        }
+
+                        // Title & Brand
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                          Column(modifier = Modifier.weight(1f)) {
+                            Text(item.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+                            Text(item.brand, fontSize = 12.sp, color = textSecondary)
+                          }
                           Text(
-                              text = "Girar Mueble (360°)",
-                              fontSize = 12.sp,
+                              "$${"%,.0f".format(item.price)}",
+                              fontSize = 22.sp,
                               fontWeight = FontWeight.Bold,
-                              color = textPrimary
+                              color = accentBlue
                           )
-                          Row(
+                        }
+
+                        // Description
+                        Text(
+                            item.description,
+                            fontSize = 12.sp,
+                            color = textSecondary,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        // Dimensions Row
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                          DimensionLabel("Ancho", "${item.widthM}m")
+                          DimensionLabel("Profundidad", "${item.depthM}m")
+                          DimensionLabel("Alto", "${item.heightM}m")
+                        }
+
+                        // Fit status check
+                        FitStatusIndicator(fitStatus)
+
+                        // Rotation Controls (Only visible if the item is currently placed in the room)
+                        if (isPlaced) {
+                          Column(
                               modifier = Modifier.fillMaxWidth(),
-                              horizontalArrangement = Arrangement.spacedBy(10.dp),
-                              verticalAlignment = Alignment.CenterVertically
+                              verticalArrangement = Arrangement.spacedBy(8.dp)
                           ) {
-                            Button(
-                                onClick = { onRotate(-15f) },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE2E8F0)),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.weight(1f).height(40.dp)
+                            Text(
+                                text = "Girar Mueble (360°)",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = textPrimary
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                              Text("↩ Izquierda -15°", color = textPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                            }
-                            Button(
-                                onClick = { onRotate(15f) },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE2E8F0)),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.weight(1f).height(40.dp)
-                            ) {
-                              Text("Derecha +15° ↪", color = textPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                              Button(
+                                  onClick = { onRotate(-15f) },
+                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE2E8F0)),
+                                  shape = RoundedCornerShape(10.dp),
+                                  modifier = Modifier.weight(1f).height(40.dp)
+                              ) {
+                                Text("↩ Izquierda -15°", color = textPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                              }
+                              Button(
+                                  onClick = { onRotate(15f) },
+                                  colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE2E8F0)),
+                                  shape = RoundedCornerShape(10.dp),
+                                  modifier = Modifier.weight(1f).height(40.dp)
+                              ) {
+                                Text("Derecha +15° ↪", color = textPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                              }
                             }
                           }
                         }
                       }
-                    }
 
-                    // Showcase action buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                      Button(
-                          onClick = { onPlaceInRoom(item) },
-                          colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
-                          shape = RoundedCornerShape(12.dp),
-                          modifier = Modifier
-                              .weight(1f)
-                              .height(48.dp)
+                      // Showcase action buttons
+                      Row(
+                          modifier = Modifier.fillMaxWidth(),
+                          horizontalArrangement = Arrangement.spacedBy(10.dp)
                       ) {
-                        Text("Place in Room", fontWeight = FontWeight.SemiBold, color = Color.White)
-                      }
+                        Button(
+                            onClick = { onPlaceInRoom(item) },
+                            colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                        ) {
+                          Text("Place in Room", fontWeight = FontWeight.SemiBold, color = Color.White)
+                        }
 
-                      Button(
-                          onClick = onRemoveFromRoom,
-                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
-                          shape = RoundedCornerShape(12.dp),
-                          modifier = Modifier.height(48.dp)
-                      ) {
-                        Text("Quitar", color = Color.White)
-                      }
+                        Button(
+                            onClick = onRemoveFromRoom,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.height(48.dp)
+                        ) {
+                          Text("Quitar", color = Color.White)
+                        }
 
-                      IconButton(
-                          onClick = {},
-                          modifier = Modifier
-                              .background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp))
-                              .size(48.dp)
-                      ) {
-                        Icon(Icons.Default.Share, contentDescription = null, tint = textPrimary)
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier
+                                .background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp))
+                                .size(48.dp)
+                        ) {
+                          Icon(Icons.Default.Share, contentDescription = null, tint = textPrimary)
+                        }
                       }
                     }
                   }
                 }
               }
-            }
 
-            // Right column: Category tabs + Item Grid
-            Column(
-                modifier = Modifier.weight(0.55f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+              // Right column: Category chips + Item Grid
+              Column(
+                  modifier = Modifier.weight(0.55f),
+                  verticalArrangement = Arrangement.spacedBy(16.dp)
+              ) {
+                // Scrollable category chips
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                  listOf(
+                      FurnitureCategory.ALL,
+                      FurnitureCategory.SEATING,
+                      FurnitureCategory.TABLES,
+                      FurnitureCategory.BEDS,
+                      FurnitureCategory.STORAGE,
+                      FurnitureCategory.DECOR
+                  ).forEach { category ->
+                    CategoryTabChip(
+                        category = category,
+                        isSelected = category == selectedCategory,
+                        onClick = { selectedCategory = category }
+                    )
+                  }
+                }
+
+                // 2-column Vertical grid of products
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                  items(displayItems, key = { it.id }) { item ->
+                    CatalogGridCard(
+                        item = item,
+                        isSelected = item == selectedItem,
+                        onClick = { onItemSelected(item) }
+                    )
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ── 3D OBJECT SCANNER SIMULATOR ───────────────────────────────────────────────
+
+@Composable
+fun ObjectScannerSimulator(
+    onPlaceInRoom: (FurnitureItem) -> Unit,
+    onItemSelected: (FurnitureItem) -> Unit
+) {
+  var step by remember { mutableStateOf(0) }
+  var progress by remember { mutableStateOf(0f) }
+  val accentBlue = Color(0xFF0F62FE)
+  val textPrimary = Color(0xFF1E293B)
+  val textSecondary = Color(0xFF64748B)
+
+  // Auto-advance scanning progress if step == 1
+  LaunchedEffect(step) {
+    if (step == 1) {
+      progress = 0f
+      while (progress < 1f) {
+        kotlinx.coroutines.delay(100)
+        progress += 0.05f
+      }
+      step = 2 // Move to processing
+    }
+    if (step == 2) {
+      kotlinx.coroutines.delay(3000) // 3 seconds cloud processing delay
+      step = 3 // Done!
+    }
+  }
+
+  Column(
+      modifier = Modifier
+          .fillMaxSize()
+          .background(Color.White, RoundedCornerShape(16.dp))
+          .padding(32.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(20.dp)
+  ) {
+    Text(
+        text = "Escáner de Objetos 3D (Marketplace Creator)",
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        color = textPrimary
+    )
+    
+    when (step) {
+      0 -> { // Setup instructions
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f).widthIn(max = 500.dp)
+        ) {
+          Text("📸", fontSize = 72.sp)
+          Text(
+              "¿Cómo funciona?",
+              fontSize = 18.sp,
+              fontWeight = FontWeight.Bold,
+              color = textPrimary
+          )
+          Text(
+              "1. Coloca un objeto real (ej. una caja, juguete o adorno) frente a ti en una mesa bien iluminada.\n" +
+              "2. Presiona 'Iniciar Escaneo'.\n" +
+              "3. Mueve tu cabeza lentamente alrededor del objeto en 360 grados.\n" +
+              "4. El visor capturará los ángulos y nuestro pipeline en la nube generará el modelo 3D (.glb) listo para vender y colocar.",
+              fontSize = 13.sp,
+              color = textSecondary,
+              lineHeight = 20.sp
+          )
+          Spacer(Modifier.height(16.dp))
+          Button(
+              onClick = { step = 1 },
+              colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
+              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier.fillMaxWidth().height(48.dp)
+          ) {
+            Text("Iniciar Escaneo 3D", color = Color.White, fontWeight = FontWeight.Bold)
+          }
+        }
+      }
+      1 -> { // Scanning simulation
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f)
+        ) {
+          Text("🔍 Escaneando...", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+          Spacer(Modifier.height(16.dp))
+          Box(
+              modifier = Modifier
+                  .size(160.dp)
+                  .background(Color(0xFFF1F5F9), CircleShape)
+                  .border(2.dp, accentBlue, CircleShape),
+              contentAlignment = Alignment.Center
+          ) {
+            Text("📦", fontSize = 64.sp)
+          }
+          Spacer(Modifier.height(24.dp))
+          LinearProgressIndicator(
+              progress = progress,
+              color = accentBlue,
+              trackColor = Color(0xFFE2E8F0),
+              modifier = Modifier.width(300.dp).height(8.dp).clip(CircleShape)
+          )
+          Spacer(Modifier.height(12.dp))
+          Text("Capturando ángulos... ${(progress * 100).toInt()}%", fontSize = 12.sp, color = textSecondary)
+        }
+      }
+      2 -> { // Cloud Processing simulation
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f)
+        ) {
+          CircularProgressIndicator(color = accentBlue, modifier = Modifier.size(64.dp))
+          Spacer(Modifier.height(24.dp))
+          Text(
+              "Reconstruyendo en la Nube (AI NeRF)",
+              fontSize = 18.sp,
+              fontWeight = FontWeight.Bold,
+              color = textPrimary
+          )
+          Text(
+              "Generando geometría 3D y texturas de alta resolución...",
+              fontSize = 13.sp,
+              color = textSecondary,
+              modifier = Modifier.padding(top = 8.dp)
+          )
+        }
+      }
+      3 -> { // Completed Screen
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f).widthIn(max = 450.dp)
+        ) {
+          Text("🎉 ¡Escaneo Completado!", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF16A34A))
+          
+          Box(
+              modifier = Modifier
+                  .size(140.dp)
+                  .background(Color(0xFFDCFCE7), CircleShape),
+              contentAlignment = Alignment.Center
+          ) {
+            Text("📦", fontSize = 72.sp)
+          }
+
+          Text(
+              "Se ha creado un modelo 3D optimizado:",
+              fontSize = 14.sp,
+              color = textSecondary
+          )
+
+          Card(
+              modifier = Modifier.fillMaxWidth(),
+              colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+              border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+          ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+              Text("Nombre: Caja de Cartón Retro", fontWeight = FontWeight.Bold, color = textPrimary)
+              Text("Origen: Escaneo Quest 3 (Juan P.)", fontSize = 12.sp, color = textSecondary)
+              Text("Dimensiones: 0.4m × 0.4m × 0.4m", fontSize = 12.sp, color = textSecondary)
+              Text("Precio sugerido: $45.00 MXN", fontSize = 12.sp, color = textSecondary)
+            }
+          }
+
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(12.dp)
+          ) {
+            Button(
+                onClick = {
+                  val boxItem = FurnitureCatalog.items.first { it.id == "scanned_box_01" }
+                  onItemSelected(boxItem)
+                  onPlaceInRoom(boxItem)
+                  step = 4
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.weight(1f).height(48.dp)
             ) {
-              // Scrollable category chips
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  horizontalArrangement = Arrangement.spacedBy(8.dp)
-              ) {
-                listOf(
-                    FurnitureCategory.ALL,
-                    FurnitureCategory.SEATING,
-                    FurnitureCategory.TABLES,
-                    FurnitureCategory.BEDS,
-                    FurnitureCategory.STORAGE,
-                    FurnitureCategory.DECOR
-                ).forEach { category ->
-                  CategoryTabChip(
-                      category = category,
-                      isSelected = category == selectedCategory,
-                      onClick = { selectedCategory = category }
-                  )
-                }
-              }
-
-              // 2-column Vertical grid of products
-              LazyVerticalGrid(
-                  columns = GridCells.Fixed(2),
-                  horizontalArrangement = Arrangement.spacedBy(12.dp),
-                  verticalArrangement = Arrangement.spacedBy(12.dp),
-                  modifier = Modifier.fillMaxSize()
-              ) {
-                items(displayItems, key = { it.id }) { item ->
-                  CatalogGridCard(
-                      item = item,
-                      isSelected = item == selectedItem,
-                      onClick = { onItemSelected(item) }
-                  )
-                }
-              }
+              Text("Place in Room", color = Color.White)
             }
+            
+            Button(
+                onClick = { step = 0 },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64748B)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.height(48.dp)
+            ) {
+              Text("Volver", color = Color.White)
+            }
+          }
+        }
+      }
+      4 -> { // Placed success screen
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f).widthIn(max = 450.dp)
+        ) {
+          Text("⚡ ¡Objeto Colocado en Realidad Mixta!", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = accentBlue)
+          Spacer(Modifier.height(16.dp))
+          Text(
+              "El objeto 'Caja de Cartón Retro' ahora está en tu habitación física. Puedes usar tus manos o controladores para moverlo y rotarlo.",
+              fontSize = 13.sp,
+              color = textSecondary,
+              textAlign = TextAlign.Center
+          )
+          Spacer(Modifier.height(24.dp))
+          Button(
+              onClick = { step = 0 },
+              colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
+              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier.width(200.dp).height(48.dp)
+          ) {
+            Text("Escanear Otro", color = Color.White)
           }
         }
       }

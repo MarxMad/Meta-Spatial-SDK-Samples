@@ -192,6 +192,14 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
     }
   }
 
+  /** Reset room scan state and transition back to scan welcome panel */
+  private fun resetRoomScan() {
+    scanState = ScanState.IDLE
+    sceneDataLoaded = false // Allow scanning again from scratch
+    catalogPanelEntity?.setComponent(Visible(false))
+    scanPanelEntity?.setComponent(Visible(true))
+  }
+
   private fun loadSceneFromDevice() {
     if (sceneDataLoaded) return
     sceneDataLoaded = true
@@ -399,7 +407,8 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
                       onItemSelected = { item -> selectedItem = item },
                       onPlaceInRoom = { item -> placeInRoom(item) },
                       onRemoveFromRoom = { removeFromRoom() },
-                      onRotate = { angle -> rotatePlacedFurniture(angle) }
+                      onRotate = { angle -> rotatePlacedFurniture(angle) },
+                      onReScanRoom = { resetRoomScan() }
                   )
                 }
               }

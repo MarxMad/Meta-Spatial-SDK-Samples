@@ -242,6 +242,46 @@ object FurnitureCatalog {
         description = "Monitor 27\" para home office.",
         purchaseUrl = "https://www.example.com/monitor"
     ),
+    // ── 3 Nuevos Productos Escaneados (Marketplace) ───────────────────────
+    FurnitureItem(
+        id = "scanned_box_01",
+        name = "Caja de Cartón Retro",
+        brand = "Escaneo Usuario (Juan P.)",
+        price = 45.0,
+        category = FurnitureCategory.DECOR,
+        glbAsset = "furniture/BoxCardBoard.glb",
+        widthM = 0.4f,
+        depthM = 0.4f,
+        heightM = 0.4f,
+        description = "Caja de cartón rústica escaneada en 3D para decoración de estilo industrial.",
+        purchaseUrl = "https://www.example.com/caja-retro"
+    ),
+    FurnitureItem(
+        id = "scanned_window_01",
+        name = "Ventana Colonial Escaneada",
+        brand = "Antigüedades CDMX",
+        price = 4200.0,
+        category = FurnitureCategory.DECOR,
+        glbAsset = "furniture/Window.glb",
+        widthM = 1.0f,
+        depthM = 0.15f,
+        heightM = 1.2f,
+        description = "Ventana de madera antigua escaneada directamente de una casona colonial.",
+        purchaseUrl = "https://www.example.com/ventana-colonial"
+    ),
+    FurnitureItem(
+        id = "scanned_door_01",
+        name = "Puerta Rústica Tallada",
+        brand = "Maderas del Bosque",
+        price = 8500.0,
+        category = FurnitureCategory.DECOR,
+        glbAsset = "furniture/Door.glb",
+        widthM = 0.9f,
+        depthM = 0.1f,
+        heightM = 2.0f,
+        description = "Puerta rústica de entrada con herrajes de hierro, escaneada en 3D para previsualización.",
+        purchaseUrl = "https://www.example.com/puerta-rustica"
+    ),
   )
 
   /** Filtrar por categoría, o devuelve todos si es ALL */
