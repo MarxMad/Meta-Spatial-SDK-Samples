@@ -68,6 +68,7 @@ fun CatalogPanel(
     var selectedCategory by remember { mutableStateOf(FurnitureCategory.ALL) }
     var searchQuery by remember { mutableStateOf("") }
     var categoryQuery by remember { mutableStateOf("") }
+    val savedItemIds = remember { mutableStateListOf<String>() }
 
     val displayItems by remember(selectedCategory, searchQuery) {
       derivedStateOf {
@@ -230,6 +231,8 @@ fun CatalogPanel(
             ProfileView()
           } else if (activeTab == "Notifications") {
             NotificationsView()
+          } else if (activeTab == "Saved") {
+            SavedItemsView(savedItemIds, onItemSelected, onPlaceInRoom)
           } else {
             Row(
                 modifier = Modifier
@@ -405,14 +408,31 @@ fun CatalogPanel(
                           Text("Quitar", color = Color.White)
                         }
 
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp))
-                                .size(48.dp)
-                        ) {
-                          Icon(Icons.Default.Share, contentDescription = null, tint = textPrimary)
-                        }
+                         val isFavorited = savedItemIds.contains(item.id)
+                         IconButton(
+                             onClick = {
+                               if (isFavorited) savedItemIds.remove(item.id)
+                               else savedItemIds.add(item.id)
+                             },
+                             modifier = Modifier
+                                 .background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp))
+                                 .size(48.dp)
+                         ) {
+                           Icon(
+                               imageVector = if (isFavorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                               contentDescription = null,
+                               tint = if (isFavorited) Color(0xFFEF4444) else textPrimary
+                           )
+                         }
+
+                         IconButton(
+                             onClick = {},
+                             modifier = Modifier
+                                 .background(Color(0xFFF1F5F9), RoundedCornerShape(12.dp))
+                                 .size(48.dp)
+                         ) {
+                           Icon(Icons.Default.Share, contentDescription = null, tint = textPrimary)
+                         }
                       }
                     }
                   }
@@ -1025,7 +1045,7 @@ fun NotificationItem(title: String, body: String, time: String) {
               .size(8.dp)
               .background(Color(0xFF0F62FE), CircleShape)
       )
-      Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -1034,6 +1054,113 @@ fun NotificationItem(title: String, body: String, time: String) {
           Text(time, fontSize = 10.sp, color = Color(0xFF94A3B8))
         }
         Text(body, fontSize = 12.sp, color = Color(0xFF64748B))
+      }
+    }
+  }
+}
+
+// ── NEW FAVORITES (SAVED ITEMS) VIEW ─────────────────────────────────────────
+
+@Composable
+fun SavedItemsView(
+    savedItemIds: List<String>,
+    onItemSelected: (FurnitureItem) -> Unit,
+    onPlaceInRoom: (FurnitureItem) -> Unit
+) {
+  val textPrimary = Color(0xFF1E293B)
+  val textSecondary = Color(0xFF64748B)
+  val accentBlue = Color(0xFF0F62FE)
+
+  val favoritedItems = remember(savedItemIds) {
+    FurnitureCatalog.items.filter { it.id in savedItemIds }
+  }
+
+  Column(
+      modifier = Modifier
+          .fillMaxSize()
+          .background(Color.White, RoundedCornerShape(16.dp))
+          .padding(32.dp),
+      verticalArrangement = Arrangement.spacedBy(20.dp)
+  ) {
+    Text("Mis Favoritos", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+
+    if (favoritedItems.isEmpty()) {
+      Column(
+          modifier = Modifier.fillMaxSize().weight(1f),
+          horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.Center
+      ) {
+        Icon(
+            imageVector = Icons.Default.FavoriteBorder,
+            contentDescription = null,
+            tint = Color(0xFFCBD5E1),
+            modifier = Modifier.size(64.dp)
+        )
+        Spacer(Modifier.height(16.dp))
+        Text("No tienes artículos guardados", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = textPrimary)
+        Text("Explora el catálogo y marca con un corazón tus muebles favoritos.", fontSize = 12.sp, color = textSecondary, textAlign = TextAlign.Center)
+      }
+    } else {
+      LazyVerticalGrid(
+          columns = GridCells.Fixed(3),
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+          modifier = Modifier.fillMaxSize().weight(1f)
+      ) {
+        items(favoritedItems) { item ->
+          Column(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .clip(RoundedCornerShape(12.dp))
+                  .background(Color(0xFFF8FAFC))
+                  .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(12.dp))
+                  .clickable { onItemSelected(item) }
+                  .padding(16.dp),
+              verticalArrangement = Arrangement.spacedBy(12.dp)
+          ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0))
+                        ),
+                        RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+              Text(
+                  text = item.category.displayName.uppercase(),
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color(0xFF64748B)
+              )
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+              Text(item.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = textPrimary, maxLines = 1)
+              Text(item.brand, fontSize = 11.sp, color = textSecondary)
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text("$${"%,.0f".format(item.price)}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = accentBlue)
+              Button(
+                  onClick = { onPlaceInRoom(item) },
+                  colors = ButtonDefaults.buttonColors(containerColor = accentBlue),
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                  shape = RoundedCornerShape(8.dp),
+                  modifier = Modifier.height(32.dp)
+              ) {
+                Text("Place", color = Color.White, fontSize = 11.sp)
+              }
+            }
+          }
+        }
       }
     }
   }
