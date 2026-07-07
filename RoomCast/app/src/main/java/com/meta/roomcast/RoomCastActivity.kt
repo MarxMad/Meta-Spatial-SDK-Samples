@@ -418,7 +418,8 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
                       onPlaceInRoom = { item -> placeInRoom(item) },
                       onRemoveFromRoom = { removeFromRoom() },
                       onRotate = { angle -> rotatePlacedFurniture(angle) },
-                      onReScanRoom = { resetRoomScan() }
+                      onReScanRoom = { resetRoomScan() },
+                      onExitApp = { finish() }
                   )
                 }
               }

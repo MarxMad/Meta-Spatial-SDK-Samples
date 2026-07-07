@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
@@ -61,7 +62,8 @@ fun CatalogPanel(
     onPlaceInRoom: (FurnitureItem) -> Unit,
     onRemoveFromRoom: () -> Unit,
     onRotate: (Float) -> Unit,
-    onReScanRoom: () -> Unit
+    onReScanRoom: () -> Unit,
+    onExitApp: () -> Unit
 ) {
   RoomCastTheme {
     var activeTab by remember { mutableStateOf("Browse") }
@@ -141,6 +143,15 @@ fun CatalogPanel(
               label = "Favoritos",
               isSelected = activeTab == "Saved",
               onClick = { activeTab = "Saved" }
+          )
+
+          Spacer(modifier = Modifier.weight(1f))
+
+          SidebarButton(
+              icon = Icons.Default.ExitToApp,
+              label = "Salir",
+              isSelected = false,
+              onClick = onExitApp
           )
         }
 
