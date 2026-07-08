@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Panel IDs -->
+  <item name="scan_panel"   type="id" />
+  <item name="catalog_panel" type="id" />
+  <item name="detail_panel"  type="id" />
+</resources>

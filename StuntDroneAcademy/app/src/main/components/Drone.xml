@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ComponentSchema
+  packageName="com.meta.droneacademy"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://developers.meta.com/horizon/spatial-sdk/0.13.0/ComponentSchema.xsd"
+>
+  <Component name="Drone">
+    <FloatAttribute name="throttle" defaultValue="0.0f" />
+    <IntAttribute name="health" defaultValue="100" />
+    <BooleanAttribute name="isFlying" defaultValue="false" />
+  </Component>
+</ComponentSchema>
