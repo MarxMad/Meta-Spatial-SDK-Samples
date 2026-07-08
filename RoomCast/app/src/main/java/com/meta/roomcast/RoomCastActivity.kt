@@ -162,19 +162,19 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
   // ── Panel spawning ────────────────────────────────────────────────────────────
 
   private fun spawnPanels() {
-    // Scan panel — center, right in front of user at comfortable reading distance
+    // Scan panel — center, right in front of user at comfortable reading distance (1.8m)
     scanPanelEntity = Entity.createPanelEntity(
         R.id.scan_panel,
-        Transform(Pose(Vector3(0f, 1.4f, 0.9f), Quaternion(0f, 180f, 0f))),
+        Transform(Pose(Vector3(0f, 1.4f, 1.8f), Quaternion(0f, 180f, 0f))),
         Grabbable(),
         Visible(true),
     )
 
-    // Catalog panel — floats in the center, angled toward user, hidden until scan done
+    // Catalog panel — floats in the center, angled toward user, hidden until scan done (2.0m)
     // Set size to a wider, dashboard-style aspect ratio: 1.6f wide, 0.9f high
     catalogPanelEntity = Entity.createPanelEntity(
         R.id.catalog_panel,
-        Transform(Pose(Vector3(0f, 1.3f, 1.1f), Quaternion(0f, 180f, 0f))),
+        Transform(Pose(Vector3(0f, 1.3f, 2.0f), Quaternion(0f, 180f, 0f))),
         Grabbable(),
         Visible(false),
     )
@@ -390,7 +390,8 @@ class RoomCastActivity : AppSystemActivity(), MRUKSceneEventListener {
                       onGrantPermission = {
                         requestPermissions(arrayOf(PERMISSION_USE_SCENE), REQUEST_CODE_SCENE)
                       },
-                      onCancelScan = if (hasScannedBefore) { { cancelRoomScan() } } else null
+                      onCancelScan = if (hasScannedBefore) { { cancelRoomScan() } } else null,
+                      onExitApp = { finish() }
                   )
                 }
               }

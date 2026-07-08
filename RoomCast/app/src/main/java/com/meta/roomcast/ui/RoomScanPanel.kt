@@ -45,6 +45,7 @@ fun RoomScanPanel(
     onStartScan: () -> Unit,
     onGrantPermission: () -> Unit,
     onCancelScan: (() -> Unit)? = null,
+    onExitApp: () -> Unit,
 ) {
   RoomCastTheme {
     Box(
@@ -125,6 +126,11 @@ fun RoomScanPanel(
                     primary = false,
                 )
               }
+              GlassmorphicButton(
+                  text = "Salir",
+                  onClick = onExitApp,
+                  primary = false,
+              )
             }
           }
           ScanState.SCANNING -> {
@@ -151,11 +157,21 @@ fun RoomScanPanel(
             )
           }
           ScanState.ERROR -> {
-            GlassmorphicButton(
-                text = "Conceder permiso",
-                onClick = onGrantPermission,
-                primary = false,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+              GlassmorphicButton(
+                  text = "Conceder permiso",
+                  onClick = onGrantPermission,
+                  primary = false,
+              )
+              GlassmorphicButton(
+                  text = "Salir",
+                  onClick = onExitApp,
+                  primary = false,
+              )
+            }
           }
         }
 
