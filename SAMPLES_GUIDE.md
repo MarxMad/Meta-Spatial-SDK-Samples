@@ -47,7 +47,18 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - [WorkstationActivity.kt](file:///Users/gerryvela/Documents/Meta-Apps/Meta-Spatial-SDK-Samples/DevSpatialWorkstation/app/src/main/java/com/meta/spatial/samples/devworkstation/WorkstationActivity.kt): Carga de escena GLXF, inicialización del Dock y cambio de Skybox 3D.
 
-### 3. `MrukSample`
+### 3. `StuntDroneAcademy` (Nuestro Proyecto)
+* **Descripción**: Simulador acrobático de vuelo de drones en Realidad Mixta (MR) que convierte tu habitación real en una carrera de obstáculos interactiva.
+* **Características Clave**:
+  - Simulación física de vuelo interactiva aplicando vectores de fuerza vertical ascendente proporcionales al acelerador.
+  - Detección de colisión a alta velocidad (telemetría de deceleración) para dañar el dron y forzar caída libre por gravedad.
+  - Panel de telemetría HUD (Compose) para calibración, armado de motores, control de aceleración y monitoreo de velocidad.
+* **Archivos Clave**:
+  - [MainActivity.kt](file:///Users/gerryvela/Documents/Meta-Apps/Meta-Spatial-SDK-Samples/StuntDroneAcademy/app/src/main/java/com/meta/droneacademy/MainActivity.kt): Inicialización de escenas, lógica del tick de físicas, detección de impactos y loops de fuerza vertical.
+  - [HudPanel.kt](file:///Users/gerryvela/Documents/Meta-Apps/Meta-Spatial-SDK-Samples/StuntDroneAcademy/app/src/main/java/com/meta/droneacademy/ui/HudPanel.kt): Interfaz de control del piloto (armado, acelerador, resets y telemetría de velocidad/salud).
+  - [Drone.xml](file:///Users/gerryvela/Documents/Meta-Apps/Meta-Spatial-SDK-Samples/StuntDroneAcademy/app/src/main/components/Drone.xml): Esquema de componente ECS personalizado para almacenar la aceleración, vida y estados de motor del dron.
+
+### 4. `MrukSample`
 * **Descripción**: El ejemplo primario para integrar escaneo del mundo real.
 * **Características Clave**:
   - Inicialización y escucha de eventos de MRUK (`MRUKFeature`).
@@ -56,7 +67,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `MrukAnchorMeshSampleActivity.kt`: Demuestra la configuración de colisionadores físicos automáticos en las etiquetas `FLOOR`, `CEILING` y `WALL_FACE`.
 
-### 4. `Object3DSampleIsdk`
+### 5. `Object3DSampleIsdk`
 * **Descripción**: Demostración avanzada de colocación de objetos 3D y manipulación utilizando el **Interaction SDK (ISDK)** de Meta.
 * **Características Clave**:
   - Hover affordance: El objeto aumenta ligeramente de tamaño (escala) al ser apuntado por el rayo o la mano del usuario.
@@ -66,7 +77,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
   - `Object3DSampleIsdkActivity.kt`: Configura el `IsdkInputListenerSystem` para detectar cuándo se agarra, apunta o suelta un objeto en el espacio.
   - `PanelLayout.kt`: Spawneo y escala dinámica de las entidades usando animadores de valor (`ValueAnimator`).
 
-### 5. `Object3DSample`
+### 6. `Object3DSample`
 * **Descripción**: Introducción básica a la carga de modelos 3D y edición de propiedades de escena a través de herramientas visuales.
 * **Características Clave**:
   - Importación y posicionamiento de mallas en formato `.glb`.
@@ -74,7 +85,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `Object3DSampleActivity.kt`: Ejemplo mínimo de inicialización de la escena 3D y carga de entornos de iluminación (`IBLEnvironment`).
 
-### 6. `PhysicsSample`
+### 7. `PhysicsSample`
 * **Descripción**: Muestra el funcionamiento del motor de físicas físicas en tiempo real (Bullet Physics) integrado en el SDK.
 * **Características Clave**:
   - Gravedad, rebotes, masa, densidad y fricción.
@@ -83,7 +94,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `PhysicsSampleActivity.kt`: Asignación de componentes `Physics` a entidades y manipulación dinámica de estados (`DYNAMIC` vs `KINEMATIC`).
 
-### 7. `UISetSample`
+### 8. `UISetSample`
 * **Descripción**: Demostración del catálogo visual y las directrices estéticas de Meta para interfaces de usuario en Horizon OS.
 * **Características Clave**:
   - Aplicación de `SpatialTheme` y `LocalColorScheme` para que Compose herede la tipografía y bordes correctos del sistema.
@@ -91,7 +102,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `UiSetSampleActivity.kt` y `UiSetLayout.kt`: Creación de paneles con temas oscuros/claros de Horizon OS.
 
-### 8. `AnimationsSample`
+### 9. `AnimationsSample`
 * **Descripción**: Control y reproducción de animaciones esqueléticas y de transformación.
 * **Características Clave**:
   - Carga de clips de animación embebidos en archivos GLB.
@@ -100,14 +111,14 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `AnimationsSampleActivity.kt` y `DroneSystem.kt`: Simulación de un dron flotante que sigue al usuario y reproduce clips de vuelo.
 
-### 9. `HybridSample`
+### 10. `HybridSample`
 * **Descripción**: Transición fluida entre vistas tradicionales de Android 2D y experiencias de realidad mixta espaciales.
 * **Características Clave**:
   - Cómo iniciar una aplicación en modo plano clásico de pantalla (2D) y "romper" los bordes para transformarla en una experiencia inmersiva 3D a petición del usuario.
 * **Archivos Clave**:
   - `HybridSampleActivity.kt`: Ciclo de vida y cambio de modo de renderizado de la actividad.
 
-### 10. `CustomComponentsSample`
+### 11. `CustomComponentsSample`
 * **Descripción**: Demostración técnica de cómo extender el motor ECS del Spatial SDK con componentes personalizados de datos.
 * **Características Clave**:
   - Creación de archivos de definición XML de componentes en la carpeta `main/components/`.
@@ -116,7 +127,7 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `LookAtComponent.xml` y `LookAtSystem.kt`: Un sistema que obliga a una entidad (como un ojo o cara) a girar y apuntar siempre hacia la cámara del visor del usuario.
 
-### 11. `MediaPlayerSample` y `PremiumMediaSample`
+### 12. `MediaPlayerSample` y `PremiumMediaSample`
 * **Descripción**: Reproductores multimedia espaciales avanzados.
 * **Características Clave**:
   - Streaming de video inmersivo de 180° y 360°.
@@ -125,14 +136,14 @@ Antes de explorar los ejemplos, es fundamental entender los tres pilares de Meta
 * **Archivos Clave**:
   - `MediaPlayerSampleActivity.kt` y `PremiumMediaSampleActivity.kt`: Integración de Exoplayer con texturas de renderizado en malla 3D.
 
-### 12. `SpatialVideoSample`
+### 13. `SpatialVideoSample`
 * **Descripción**: Muestra la reproducción de archivos de video multicanal con audio espacializado (3D Audio).
 * **Características Clave**:
   - Modulación del sonido basado en la distancia y orientación de la cabeza del usuario con respecto al televisor virtual.
 * **Archivos Clave**:
   - `SpatialVideoSampleActivity.kt`: Configuración de fuentes de audio posicional y atenuación sonora.
 
-### 13. `BodyTrackingSample`
+### 14. `BodyTrackingSample`
 * **Descripción**: Acceso a los datos del esqueleto y articulaciones del cuerpo del usuario.
 * **Características Clave**:
   - Lectura de la posición de hombros, codos, muñecas y dedos en tiempo real.
